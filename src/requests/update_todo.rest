@@ -1,0 +1,7 @@
+PUT http://localhost:3001/api/todos/id=63322fee9723ed90d7376827
+Content-Type: application/json
+
+{
+  "title": "I'm modifying this todo because it's done!",
+  "isCompleted": true
+}

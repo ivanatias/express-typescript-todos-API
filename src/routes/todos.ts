@@ -1,37 +1,117 @@
 import express from 'express'
-import * as todosServices from '../services/service.todos'
-import toNewTodo from '../utils/check-new-todo'
+import { Todo } from '../models/todo'
+import { isValidTodo } from '../utils/check-todo-info'
+import notFound from '../middlewares/not-found'
+import handleErrors from '../middlewares/handle-errors'
 
 const router = express.Router()
 
-router.get('/', (_req, res) => {
-  res.send(todosServices.getTodos())
+router.get('/', (_req, res, next) => {
+  Todo.find({})
+    .then((todos) => {
+      res.json(todos)
+    })
+    .catch((err) => {
+      next(err)
+    })
 })
 
-router.post('/deleteTodo', (req, res) => {
-  if (req.method !== 'POST') res.status(405).end()
+router.get('/:id', (req, res, next) => {
+  const id: string = req.params.id
 
-  const todoToDelete = req.body
-  let todoDeleted
+  Todo.findById(id)
+    .then((foundTodo) => {
+      if (!foundTodo) return res.status(404).end()
+      return res.json(foundTodo)
+    })
+    .catch((err) => {
+      next(err)
+    })
+})
 
-  if (todoToDelete) {
-    todoDeleted = todosServices.deleteTodo(todoToDelete)
+router.delete('/:id', (req, res, next) => {
+  if (req.method !== 'DELETE') return res.status(405).end()
+
+  const id: string = req.params.id
+
+  const formatedId = id.substring(3)
+
+  return Todo.findByIdAndDelete(formatedId)
+    .then((todoToDelete) => {
+      if (!todoToDelete) return res.status(404).end()
+      return res
+        .status(204)
+        .send({ message: `Todo with ID ${formatedId} was deleted.` })
+    })
+    .catch((err) => {
+      next(err)
+    })
+})
+
+router.post('/', (req, res, next) => {
+  const todoFromRequest = req.body
+
+  if (!todoFromRequest.title) {
+    return res.status(400).json({
+      error: 'Todo title must be specified'
+    })
   }
 
-  todoDeleted ? res.send(todosServices.getTodos()) : res.status(404).end()
-})
-
-router.post('/', (req, res) => {
-  try {
-    const newTodo = toNewTodo(req.body)
-
-    const addedNewTodo = todosServices.addTodo(newTodo)
-
-    res.json(addedNewTodo)
-  } catch (error) {
-    if (error instanceof Error) res.status(400).send(error.message)
-    console.log('Unexpected Error', error)
+  if (!isValidTodo(todoFromRequest)) {
+    return res.status(400).send({
+      error:
+        'Invalid Todo format. Todo title must be of type string and Todo priority must be of type boolean.'
+    })
   }
+
+  const newTodoToAdd = new Todo({
+    isCompleted: false,
+    date: Date.now(),
+    title: todoFromRequest.title,
+    isPriority: todoFromRequest.isPriority
+  })
+
+  return newTodoToAdd
+    .save()
+    .then((todo) => {
+      res.status(201).json(todo)
+    })
+    .catch((err) => {
+      next(err)
+    })
 })
+
+router.put('/:id', (req, res, next) => {
+  if (req.method !== 'PUT') return res.status(405).end()
+
+  const id: string = req.params.id
+  const formatedId = id.substring(3)
+
+  const newTodoInfoFromRequest = req.body
+
+  if (!newTodoInfoFromRequest.title) {
+    return res.status(400).send({
+      error: 'Todo title must be specified.'
+    })
+  }
+
+  const newTodoContent = {
+    title: newTodoInfoFromRequest.title,
+    isPriority: newTodoInfoFromRequest.isPriority,
+    isCompleted: newTodoInfoFromRequest.isCompleted
+  }
+
+  return Todo.findByIdAndUpdate(formatedId, newTodoContent, { new: true })
+    .then((updatedTodo) => {
+      if (!updatedTodo) return res.status(404).end()
+      return res.json(updatedTodo)
+    })
+    .catch((err) => {
+      next(err)
+    })
+})
+
+router.use(notFound)
+router.use(handleErrors)
 
 export default router

@@ -1,10 +1,14 @@
 import express from 'express'
+import dotenv from 'dotenv'
+import './mongo'
 import todosRouter from './routes/todos'
+
+dotenv.config()
+
+const PORT = process.env.PORT
 
 const app = express()
 app.use(express.json())
-
-const PORT = 3001
 
 app.get('/ping', (_req, res) => {
   console.log('someone requested something at this endpoint!')

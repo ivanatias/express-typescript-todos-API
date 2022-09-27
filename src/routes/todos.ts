@@ -22,7 +22,7 @@ router.get('/:id', (req, res, next) => {
   Todo.findById(id)
     .then((foundTodo) => {
       if (!foundTodo) return res.status(404).end()
-      return res.json(foundTodo)
+      res.json(foundTodo)
     })
     .catch((err) => {
       next(err)
@@ -36,10 +36,10 @@ router.delete('/:id', (req, res, next) => {
 
   const formatedId = id.substring(3)
 
-  return Todo.findByIdAndDelete(formatedId)
+  Todo.findByIdAndDelete(formatedId)
     .then((todoToDelete) => {
       if (!todoToDelete) return res.status(404).end()
-      return res
+      res
         .status(204)
         .send({ message: `Todo with ID ${formatedId} was deleted.` })
     })
@@ -71,7 +71,7 @@ router.post('/', (req, res, next) => {
     isPriority: todoFromRequest.isPriority
   })
 
-  return newTodoToAdd
+  newTodoToAdd
     .save()
     .then((todo) => {
       res.status(201).json(todo)
@@ -101,10 +101,10 @@ router.put('/:id', (req, res, next) => {
     isCompleted: newTodoInfoFromRequest.isCompleted
   }
 
-  return Todo.findByIdAndUpdate(formatedId, newTodoContent, { new: true })
+  Todo.findByIdAndUpdate(formatedId, newTodoContent, { new: true })
     .then((updatedTodo) => {
       if (!updatedTodo) return res.status(404).end()
-      return res.json(updatedTodo)
+      res.json(updatedTodo)
     })
     .catch((err) => {
       next(err)

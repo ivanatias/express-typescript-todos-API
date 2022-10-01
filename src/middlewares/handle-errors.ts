@@ -8,6 +8,15 @@ const ERROR_HANDLERS: ErrorHandlers = {
   CastError: (res: Response) =>
     res.status(400).send({ error: 'The ID of the Todo is invalid.' }),
 
+  MongoServerError: (res: Response, error?: TypeError) => {
+    if (error?.message.startsWith('E11000')) {
+      res.status(409).send({
+        error: 'This username already exists.'
+      })
+    }
+    res.status(500).end()
+  },
+
   defaultError: (res: Response, error?: TypeError) => {
     console.error(error)
     res.status(500).end()

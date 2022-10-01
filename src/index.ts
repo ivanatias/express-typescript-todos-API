@@ -2,6 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import './mongo'
 import todosRouter from './routes/todos'
+import usersRouter from './routes/users'
 import notFound from './middlewares/not-found'
 
 dotenv.config()
@@ -17,6 +18,7 @@ app.get('/', (_req, res) => {
 })
 
 app.use('/api/todos', todosRouter)
+app.use('/api/users', usersRouter)
 
 app.use(notFound)
 

@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import './mongo'
 import todosRouter from './routes/todos'
 import usersRouter from './routes/users'
+import loginRouter from './routes/login'
 import notFound from './middlewares/not-found'
 
 dotenv.config()
@@ -19,6 +20,7 @@ app.get('/', (_req, res) => {
 
 app.use('/api/todos', todosRouter)
 app.use('/api/users', usersRouter)
+app.use('/api/login', loginRouter)
 
 app.use(notFound)
 

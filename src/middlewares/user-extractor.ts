@@ -24,7 +24,7 @@ export default (req: ExtractorRequest, _res: Response, next: NextFunction) => {
 
   const { id } = decodedToken
 
-  req.userId = id ?? undefined
+  req.userId = id
 
   next()
 }

@@ -16,7 +16,7 @@ export default (req: ExtractorRequest, _res: Response, next: NextFunction) => {
   const auth = req.get('Authorization')
   let token = ''
 
-  if (auth && auth.startsWith('Bearer' || 'bearer')) {
+  if (auth && auth.startsWith('Bearer')) {
     token = auth.substring(7)
   }
 

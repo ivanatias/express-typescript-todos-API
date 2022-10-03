@@ -1,55 +1,85 @@
 import express from 'express'
 import { Todo } from '../models/todo'
+import { User } from '../models/user'
 import { isValidTodo } from '../utils/check-todo-info'
+import { checkTodoOwnership } from '../utils/check-todo-ownership'
+import userExtractor, { ExtractorRequest } from '../middlewares/user-extractor'
 import notFound from '../middlewares/not-found'
 import handleErrors from '../middlewares/handle-errors'
 
 const router = express.Router()
 
-router.get('/', (_req, res, next) => {
-  Todo.find({})
-    .then((todos) => {
-      res.json(todos)
-    })
-    .catch((err) => {
-      next(err)
-    })
+const todosUserInfoReturned = {
+  username: 1,
+  name: 1
+}
+
+router.get('/', async (_req, res, next) => {
+  try {
+    const todos = await Todo.find({}).populate('user', todosUserInfoReturned)
+
+    res.json(todos)
+  } catch (err) {
+    next(err)
+  }
 })
 
-router.get('/:id', (req, res, next) => {
+router.get('/:id', async (req, res, next) => {
   const id: string = req.params.id
 
-  Todo.findById(id)
-    .then((foundTodo) => {
-      if (!foundTodo) return res.status(404).end()
-      res.json(foundTodo)
-    })
-    .catch((err) => {
-      next(err)
-    })
+  try {
+    const foundTodo = await Todo.findById(id).populate(
+      'user',
+      todosUserInfoReturned
+    )
+
+    if (!foundTodo) return res.status(404).end()
+
+    res.json(foundTodo)
+  } catch (err) {
+    next(err)
+  }
 })
 
-router.delete('/:id', (req, res, next) => {
-  if (req.method !== 'DELETE') return res.status(405).end()
+router.delete(
+  '/:id',
+  userExtractor,
+  async (req: ExtractorRequest, res, next) => {
+    if (req.method !== 'DELETE') return res.status(405).end()
 
-  const id: string = req.params.id
+    const id: string = req.params.id
+    const formatedTodoId = id.substring(3)
 
-  const formatedId = id.substring(3)
+    const { userId } = req
 
-  Todo.findByIdAndDelete(formatedId)
-    .then((todoToDelete) => {
+    const isTodoOwnedByUser = await checkTodoOwnership(formatedTodoId, userId)
+
+    if (isTodoOwnedByUser !== undefined && !isTodoOwnedByUser) {
+      return res.status(401).send({
+        message: 'You are not authorized to delete this todo.'
+      })
+    }
+
+    try {
+      const todoToDelete = await Todo.findByIdAndDelete(formatedTodoId)
+
       if (!todoToDelete) return res.status(404).end()
-      res
-        .status(204)
-        .send({ message: `Todo with ID ${formatedId} was deleted.` })
-    })
-    .catch((err) => {
-      next(err)
-    })
-})
 
-router.post('/', (req, res, next) => {
+      res.status(204).end()
+    } catch (err) {
+      next(err)
+    }
+  }
+)
+
+router.post('/', userExtractor, async (req: ExtractorRequest, res, next) => {
+  if (req.method !== 'POST') return res.status(405).end()
+
   const todoFromRequest = req.body
+
+  const { userId } = req
+
+  const user = await User.findById(userId)
 
   if (!todoFromRequest.title) {
     return res.status(400).json({
@@ -68,24 +98,30 @@ router.post('/', (req, res, next) => {
     isCompleted: false,
     date: Date.now(),
     title: todoFromRequest.title,
-    isPriority: todoFromRequest.isPriority
+    isPriority: todoFromRequest.isPriority,
+    user: user?.id
   })
 
-  newTodoToAdd
-    .save()
-    .then((todo) => {
-      res.status(201).json(todo)
-    })
-    .catch((err) => {
-      next(err)
-    })
+  try {
+    const savedTodo = await newTodoToAdd.save()
+
+    user?.todos.push(savedTodo._id)
+
+    await user?.save()
+
+    res.json(savedTodo)
+  } catch (err) {
+    next(err)
+  }
 })
 
-router.put('/:id', (req, res, next) => {
+router.put('/:id', userExtractor, async (req: ExtractorRequest, res, next) => {
   if (req.method !== 'PUT') return res.status(405).end()
 
   const id: string = req.params.id
-  const formatedId = id.substring(3)
+  const formatedTodoId = id.substring(3)
+
+  const { userId } = req
 
   const newTodoInfoFromRequest = req.body
 
@@ -95,20 +131,33 @@ router.put('/:id', (req, res, next) => {
     })
   }
 
+  const isTodoOwnedByUser = await checkTodoOwnership(formatedTodoId, userId)
+
+  if (isTodoOwnedByUser !== undefined && !isTodoOwnedByUser) {
+    return res.status(401).send({
+      message: 'You are not authorized to edit this todo.'
+    })
+  }
+
   const newTodoContent = {
     title: newTodoInfoFromRequest.title,
     isPriority: newTodoInfoFromRequest.isPriority,
     isCompleted: newTodoInfoFromRequest.isCompleted
   }
 
-  Todo.findByIdAndUpdate(formatedId, newTodoContent, { new: true })
-    .then((updatedTodo) => {
-      if (!updatedTodo) return res.status(404).end()
-      res.json(updatedTodo)
-    })
-    .catch((err) => {
-      next(err)
-    })
+  try {
+    const updatedTodo = await Todo.findByIdAndUpdate(
+      formatedTodoId,
+      newTodoContent,
+      { new: true }
+    )
+
+    if (!updatedTodo) return res.status(404).end()
+
+    res.json(updatedTodo)
+  } catch (err) {
+    next(err)
+  }
 })
 
 router.use(notFound)

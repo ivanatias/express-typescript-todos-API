@@ -39,7 +39,7 @@ export default (
   res: Response,
   _next: NextFunction
 ) => {
-  const handlerToUse = ERROR_HANDLERS[error.name] || ERROR_HANDLERS.defaultError
+  const handler = ERROR_HANDLERS[error.name] || ERROR_HANDLERS.defaultError
 
-  handlerToUse(res, error)
+  handler(res, error)
 }

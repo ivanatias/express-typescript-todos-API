@@ -1,7 +1,7 @@
 import { Model, Schema, Document, model, Types } from 'mongoose'
 import { TodoType } from './todo'
 
-interface UserType extends Document {
+export interface UserType extends Document {
   name: string
   username: string
   passwordHash: string

@@ -52,9 +52,12 @@ router.delete(
 
     const { userId } = req
 
-    const isTodoOwnedByUser = await checkTodoOwnership(formatedTodoId, userId)
+    const { todoExists, isTodoOwnedByUser } = await checkTodoOwnership(
+      formatedTodoId,
+      userId
+    )
 
-    if (isTodoOwnedByUser !== undefined && !isTodoOwnedByUser) {
+    if (todoExists && !isTodoOwnedByUser) {
       return res.status(401).send({
         message: 'You are not authorized to delete this todo.'
       })
@@ -131,9 +134,12 @@ router.put('/:id', userExtractor, async (req: ExtractorRequest, res, next) => {
     })
   }
 
-  const isTodoOwnedByUser = await checkTodoOwnership(formatedTodoId, userId)
+  const { todoExists, isTodoOwnedByUser } = await checkTodoOwnership(
+    formatedTodoId,
+    userId
+  )
 
-  if (isTodoOwnedByUser !== undefined && !isTodoOwnedByUser) {
+  if (todoExists && !isTodoOwnedByUser) {
     return res.status(401).send({
       message: 'You are not authorized to edit this todo.'
     })

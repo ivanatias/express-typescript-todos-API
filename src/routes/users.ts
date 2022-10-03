@@ -6,14 +6,14 @@ import handleErrors from '../middlewares/handle-errors'
 
 const router = express.Router()
 
-router.get('/', (_req, res, next) => {
-  User.find({})
-    .then((users) => {
-      res.json(users)
-    })
-    .catch((err) => {
-      next(err)
-    })
+router.get('/', async (_req, res, next) => {
+  try {
+    const users = await User.find({}).populate('todos')
+
+    res.json(users)
+  } catch (err) {
+    next(err)
+  }
 })
 
 router.post('/', async (req, res, next) => {

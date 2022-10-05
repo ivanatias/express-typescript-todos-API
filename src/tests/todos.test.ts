@@ -6,8 +6,7 @@ import {
   API,
   dummyTodos,
   userWithTodo,
-  provideTokenToUser,
-  createAndSaveTestUser,
+  createAndLoginUser,
   userWithNoTodo
 } from './helpers'
 
@@ -53,16 +52,14 @@ describe('GET a todo', () => {
 describe('DELETE todo', () => {
   test('a logged in user is able to delete his/her own todo', async () => {
     const { name, username, passwordHash, _id } = userWithTodo
-    const user = await createAndSaveTestUser(name, username, passwordHash, _id)
+    const token = await createAndLoginUser(name, username, passwordHash, _id)
 
     const todoToDelete = await Todo.findOne({
       title: 'This todo should be deleted'
     })
 
-    const tokenForUser = provideTokenToUser(user.username, user._id)
-
     await API.delete(`/api/todos/${todoToDelete?._id}`)
-      .set('Authorization', `Bearer ${tokenForUser}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(204)
 
     const response = await API.get('/api/todos')
@@ -71,16 +68,14 @@ describe('DELETE todo', () => {
 
   test('a logged in user should not be able to delete a todo that he/she does not own', async () => {
     const { name, username, passwordHash } = userWithNoTodo
-    const user = await createAndSaveTestUser(name, username, passwordHash)
+    const token = await createAndLoginUser(name, username, passwordHash)
 
     const todoToDelete = await Todo.findOne({
       title: 'This todo should not be deleted'
     })
 
-    const tokenForUser = provideTokenToUser(user.username, user._id)
-
     await API.delete(`/api/todos/${todoToDelete?._id}`)
-      .set('Authorization', `Bearer ${tokenForUser}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(401)
 
     const response = await API.get('/api/todos')
@@ -99,9 +94,7 @@ describe('DELETE todo', () => {
 describe('PUT todo', () => {
   test('a logged in user is able to update his/her own todo', async () => {
     const { name, username, passwordHash, _id } = userWithTodo
-    const user = await createAndSaveTestUser(name, username, passwordHash, _id)
-
-    const tokenForUser = provideTokenToUser(user.username, user._id)
+    const token = await createAndLoginUser(name, username, passwordHash, _id)
 
     const todoToUpdate = await Todo.findOne({
       title: 'This todo should be updated'
@@ -112,7 +105,7 @@ describe('PUT todo', () => {
     }
 
     const response = await API.put(`/api/todos/${todoToUpdate?._id}`)
-      .set('Authorization', `Bearer ${tokenForUser}`)
+      .set('Authorization', `Bearer ${token}`)
       .send(newContent)
       .expect(200)
     expect(response.body.title).toContain(newContent.title)
@@ -122,9 +115,7 @@ describe('PUT todo', () => {
 describe('POST todo', () => {
   test('a logged in user can create a new todo', async () => {
     const { name, username, passwordHash } = userWithNoTodo
-    const user = await createAndSaveTestUser(name, username, passwordHash)
-
-    const tokenForUser = provideTokenToUser(user.username, user._id)
+    const token = await createAndLoginUser(name, username, passwordHash)
 
     const newTodo = {
       title: 'This is a fresh, new todo',
@@ -132,7 +123,7 @@ describe('POST todo', () => {
     }
 
     await API.post('/api/todos')
-      .set('Authorization', `Bearer ${tokenForUser}`)
+      .set('Authorization', `Bearer ${token}`)
       .send(newTodo)
       .expect(200)
     const response = await API.get('/api/todos')

@@ -51,40 +51,29 @@ const dummyTodos = [
   }
 ]
 
-const provideTokenToUser = (username: string, id: string) => {
-  const userDataForToken = {
-    username,
-    id
-  }
-
-  const tokenForUser = jwt.sign(userDataForToken, JWT_SECRET as string)
-
-  return tokenForUser
-}
-
-const createAndSaveTestUser = async (
+const createAndLoginUser = async (
   name: string,
   username: string,
   password: string,
   id?: Types.ObjectId
 ) => {
-  const newTestUser = new User({
+  const newUser = new User({
     name,
     username,
     passwordHash: password,
     _id: id
   })
 
-  await newTestUser.save()
+  await newUser.save()
 
-  return newTestUser
+  const userDataForToken = {
+    username: newUser.username,
+    id: newUser._id
+  }
+
+  const token = jwt.sign(userDataForToken, JWT_SECRET as string)
+
+  return token
 }
 
-export {
-  API,
-  dummyTodos,
-  provideTokenToUser,
-  createAndSaveTestUser,
-  userWithTodo,
-  userWithNoTodo
-}
+export { API, dummyTodos, createAndLoginUser, userWithTodo, userWithNoTodo }

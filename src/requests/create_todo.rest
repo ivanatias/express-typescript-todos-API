@@ -1,6 +1,6 @@
 POST http://localhost:3001/api/todos 
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Iml2YW5hdGlhcyIsImlkIjoiNjMzMjdjYjVmMmUxZWMwYWYxNzUyYzEyIiwiaWF0IjoxNjY0NzQ1NTAzLCJleHAiOjE2NjUxNzc1MDN9.wwwdGQ-W8joERagDhf6an25u8EWEklinw9wgLwcznN0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Iml2YW5hdGlhcyIsImlkIjoiNjMzY2IxNjc5Yjc2YTI4NDNjOWY4NTBlIiwiaWF0IjoxNjY0OTIyMDA1LCJleHAiOjE2NjUzNTQwMDV9.uaZpr-P8CzqPu_DtoXPhNfwU0hmDnvUN_GwLbJbfWYk
 
 {
   "title": "todo created with an authorization token!",

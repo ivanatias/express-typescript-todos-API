@@ -47,13 +47,12 @@ router.delete(
   async (req: ExtractorRequest, res, next) => {
     if (req.method !== 'DELETE') return res.status(405).end()
 
-    const id: string = req.params.id
-    const formatedTodoId = id.substring(3)
+    const { id } = req.params
 
     const { userId } = req
 
     const { todoExists, isTodoOwnedByUser } = await checkTodoOwnership(
-      formatedTodoId,
+      id,
       userId
     )
 
@@ -64,7 +63,7 @@ router.delete(
     }
 
     try {
-      const todoToDelete = await Todo.findByIdAndDelete(formatedTodoId)
+      const todoToDelete = await Todo.findByIdAndDelete(id)
 
       if (!todoToDelete) return res.status(404).end()
 
@@ -121,8 +120,7 @@ router.post('/', userExtractor, async (req: ExtractorRequest, res, next) => {
 router.put('/:id', userExtractor, async (req: ExtractorRequest, res, next) => {
   if (req.method !== 'PUT') return res.status(405).end()
 
-  const id: string = req.params.id
-  const formatedTodoId = id.substring(3)
+  const { id } = req.params
 
   const { userId } = req
 
@@ -134,10 +132,7 @@ router.put('/:id', userExtractor, async (req: ExtractorRequest, res, next) => {
     })
   }
 
-  const { todoExists, isTodoOwnedByUser } = await checkTodoOwnership(
-    formatedTodoId,
-    userId
-  )
+  const { todoExists, isTodoOwnedByUser } = await checkTodoOwnership(id, userId)
 
   if (todoExists && !isTodoOwnedByUser) {
     return res.status(401).send({
@@ -152,11 +147,9 @@ router.put('/:id', userExtractor, async (req: ExtractorRequest, res, next) => {
   }
 
   try {
-    const updatedTodo = await Todo.findByIdAndUpdate(
-      formatedTodoId,
-      newTodoContent,
-      { new: true }
-    )
+    const updatedTodo = await Todo.findByIdAndUpdate(id, newTodoContent, {
+      new: true
+    })
 
     if (!updatedTodo) return res.status(404).end()
 

@@ -7,7 +7,8 @@ import {
   dummyTodos,
   userWithTodo,
   createAndLoginUser,
-  userWithNoTodo
+  userWithNoTodo,
+  nonExistentTodoId
 } from './helpers'
 
 beforeEach(async () => {
@@ -45,7 +46,7 @@ describe('GET a todo', () => {
   })
 
   test('is not possible to retrieve a todo that does not exist providing a valid id', async () => {
-    await API.get('/api/todos/633b59a165510680300479be').expect(404)
+    await API.get(`/api/todos/${nonExistentTodoId}`).expect(404)
   })
 })
 

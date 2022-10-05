@@ -51,6 +51,8 @@ const dummyTodos = [
   }
 ]
 
+const nonExistentTodoId = new Types.ObjectId()
+
 const createAndLoginUser = async (
   name: string,
   username: string,
@@ -76,4 +78,11 @@ const createAndLoginUser = async (
   return token
 }
 
-export { API, dummyTodos, createAndLoginUser, userWithTodo, userWithNoTodo }
+export {
+  API,
+  dummyTodos,
+  createAndLoginUser,
+  userWithTodo,
+  userWithNoTodo,
+  nonExistentTodoId
+}

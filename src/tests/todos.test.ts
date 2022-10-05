@@ -121,8 +121,8 @@ describe('PUT todo', () => {
 
 describe('POST todo', () => {
   test('a logged in user can create a new todo', async () => {
-    const { name, username, passwordHash, _id } = userWithTodo
-    const user = await createAndSaveTestUser(name, username, passwordHash, _id)
+    const { name, username, passwordHash } = userWithNoTodo
+    const user = await createAndSaveTestUser(name, username, passwordHash)
 
     const tokenForUser = provideTokenToUser(user.username, user._id)
 

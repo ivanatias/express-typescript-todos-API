@@ -3,21 +3,20 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
+const { NODE_ENV, MONGODB_URI, MONGODB_URI_TEST } = process.env
+
 const connectionString =
-  process.env.NODE_ENV === 'test'
-    ? (process.env.MONGODB_URI_TEST as string)
-    : (process.env.MONGODB_URI as string)
+  NODE_ENV === 'test' ? (MONGODB_URI_TEST as string) : (MONGODB_URI as string)
 
-mongoose
-  .connect(connectionString)
-  .then(() => {
-    console.log('Connected to Database')
-  })
-  .catch((error) => {
-    console.error(error)
-  })
+const connectDB = () => {
+  mongoose
+    .connect(connectionString)
+    .then(() => {
+      console.log('Connected to Database')
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
 
-process.on('uncaughtException', (error) => {
-  console.error(error)
-  mongoose.disconnect()
-})
+export { connectDB }

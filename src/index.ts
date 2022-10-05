@@ -1,12 +1,13 @@
 import express from 'express'
 import dotenv from 'dotenv'
-import './mongo'
+import { connectDB } from './mongo'
 import todosRouter from './routes/todos'
 import usersRouter from './routes/users'
 import loginRouter from './routes/login'
 import notFound from './middlewares/not-found'
 
 dotenv.config()
+connectDB()
 
 const PORT = process.env.PORT || 3001
 

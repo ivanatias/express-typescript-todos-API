@@ -24,7 +24,7 @@ router.get('/', async (_req, res, next) => {
 })
 
 router.get('/:id', async (req, res, next) => {
-  const id: string = req.params.id
+  const { id } = req.params
 
   try {
     const foundTodo = await Todo.findById(id).populate(

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 
-const JWT_SECRET = process.env.JWT_SECRET
+const { JWT_SECRET } = process.env
 
 export interface ExtractorRequest extends Request {
   userId?: string

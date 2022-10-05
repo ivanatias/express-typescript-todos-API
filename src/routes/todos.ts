@@ -2,7 +2,6 @@ import express from 'express'
 import { Todo } from '../models/todo'
 import { User } from '../models/user'
 import { isValidTodo } from '../utils/check-todo-info'
-import { checkTodoOwnership } from '../utils/check-todo-ownership'
 import userExtractor, { ExtractorRequest } from '../middlewares/user-extractor'
 import notFound from '../middlewares/not-found'
 import handleErrors from '../middlewares/handle-errors'
@@ -51,21 +50,20 @@ router.delete(
 
     const { userId } = req
 
-    const { todoExists, isTodoOwnedByUser } = await checkTodoOwnership(
-      id,
-      userId
-    )
-
-    if (todoExists && !isTodoOwnedByUser) {
-      return res.status(401).send({
-        message: 'You are not authorized to delete this todo.'
-      })
-    }
-
     try {
-      const todoToDelete = await Todo.findByIdAndDelete(id)
+      const todoToDelete = await Todo.findById(id)
 
       if (!todoToDelete) return res.status(404).end()
+
+      const userIdInTodo = todoToDelete.user.toString()
+
+      if (userIdInTodo !== userId) {
+        return res.status(401).send({
+          message: 'You are not authorized to delete this todo.'
+        })
+      }
+
+      await Todo.findByIdAndDelete(id)
 
       res.status(204).end()
     } catch (err) {
@@ -132,26 +130,28 @@ router.put('/:id', userExtractor, async (req: ExtractorRequest, res, next) => {
     })
   }
 
-  const { todoExists, isTodoOwnedByUser } = await checkTodoOwnership(id, userId)
-
-  if (todoExists && !isTodoOwnedByUser) {
-    return res.status(401).send({
-      message: 'You are not authorized to edit this todo.'
-    })
-  }
-
-  const newTodoContent = {
-    title: newTodoInfoFromRequest.title,
-    isPriority: newTodoInfoFromRequest.isPriority,
-    isCompleted: newTodoInfoFromRequest.isCompleted
-  }
-
   try {
+    const todoToUpdate = await Todo.findById(id)
+
+    if (!todoToUpdate) return res.status(404).end()
+
+    const userIdInTodo = todoToUpdate.user.toString()
+
+    if (userIdInTodo !== userId) {
+      return res.status(401).send({
+        message: 'You are not authorized to edit this todo.'
+      })
+    }
+
+    const newTodoContent = {
+      title: newTodoInfoFromRequest.title,
+      isPriority: newTodoInfoFromRequest.isPriority,
+      isCompleted: newTodoInfoFromRequest.isCompleted
+    }
+
     const updatedTodo = await Todo.findByIdAndUpdate(id, newTodoContent, {
       new: true
     })
-
-    if (!updatedTodo) return res.status(404).end()
 
     res.json(updatedTodo)
   } catch (err) {

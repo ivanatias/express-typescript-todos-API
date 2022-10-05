@@ -7,7 +7,7 @@ import handleErrors from '../middlewares/handle-errors'
 
 const router = express.Router()
 
-const JWT_SECRET = process.env.JWT_SECRET
+const { JWT_SECRET } = process.env
 
 router.post('/', async (req, res, next) => {
   if (req.method !== 'POST') return res.status(405).end()

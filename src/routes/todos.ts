@@ -3,6 +3,7 @@ import { Todo } from '../models/todo'
 import { User } from '../models/user'
 import { isValidTodo } from '../utils/check-todo-info'
 import userExtractor, { ExtractorRequest } from '../middlewares/user-extractor'
+import todoOwnership from '../middlewares/todo-ownership'
 import notFound from '../middlewares/not-found'
 import handleErrors from '../middlewares/handle-errors'
 
@@ -43,26 +44,13 @@ router.get('/:id', async (req, res, next) => {
 router.delete(
   '/:id',
   userExtractor,
+  todoOwnership,
   async (req: ExtractorRequest, res, next) => {
     if (req.method !== 'DELETE') return res.status(405).end()
 
     const { id } = req.params
 
-    const { userId } = req
-
     try {
-      const todoToDelete = await Todo.findById(id)
-
-      if (!todoToDelete) return res.status(404).end()
-
-      const userIdInTodo = todoToDelete.user.toString()
-
-      if (userIdInTodo !== userId) {
-        return res.status(401).send({
-          message: 'You are not authorized to delete this todo.'
-        })
-      }
-
       await Todo.findByIdAndDelete(id)
 
       res.status(204).end()
@@ -115,49 +103,40 @@ router.post('/', userExtractor, async (req: ExtractorRequest, res, next) => {
   }
 })
 
-router.put('/:id', userExtractor, async (req: ExtractorRequest, res, next) => {
-  if (req.method !== 'PUT') return res.status(405).end()
+router.put(
+  '/:id',
+  userExtractor,
+  todoOwnership,
+  async (req: ExtractorRequest, res, next) => {
+    if (req.method !== 'PUT') return res.status(405).end()
 
-  const { id } = req.params
+    const { id } = req.params
 
-  const { userId } = req
+    const { title, isPriority, isCompleted } = req.body
 
-  const newTodoInfoFromRequest = req.body
-
-  if (!newTodoInfoFromRequest.title) {
-    return res.status(400).send({
-      error: 'Todo title must be specified.'
-    })
-  }
-
-  try {
-    const todoToUpdate = await Todo.findById(id)
-
-    if (!todoToUpdate) return res.status(404).end()
-
-    const userIdInTodo = todoToUpdate.user.toString()
-
-    if (userIdInTodo !== userId) {
-      return res.status(401).send({
-        message: 'You are not authorized to edit this todo.'
+    if (!title) {
+      return res.status(400).send({
+        error: 'Todo title must be specified.'
       })
     }
 
     const newTodoContent = {
-      title: newTodoInfoFromRequest.title,
-      isPriority: newTodoInfoFromRequest.isPriority,
-      isCompleted: newTodoInfoFromRequest.isCompleted
+      title,
+      isPriority,
+      isCompleted
     }
 
-    const updatedTodo = await Todo.findByIdAndUpdate(id, newTodoContent, {
-      new: true
-    })
+    try {
+      const updatedTodo = await Todo.findByIdAndUpdate(id, newTodoContent, {
+        new: true
+      })
 
-    res.json(updatedTodo)
-  } catch (err) {
-    next(err)
+      res.json(updatedTodo)
+    } catch (err) {
+      next(err)
+    }
   }
-})
+)
 
 router.use(notFound)
 router.use(handleErrors)

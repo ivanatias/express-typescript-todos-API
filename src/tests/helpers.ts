@@ -8,6 +8,12 @@ const { JWT_SECRET } = process.env
 
 const API = supertest(app)
 
+type ReturnedUser = {
+  id: string
+  name: string
+  username: string
+}
+
 const userWithNoTodo = {
   name: 'User with no todo',
   username: 'userwithnotodo',
@@ -51,7 +57,20 @@ const dummyTodos = [
   }
 ]
 
+const dummyUsers = [userWithTodo, userWithNoTodo]
+
 const nonExistentTodoId = new Types.ObjectId()
+
+const newUserInfo = {
+  username: 'newuser',
+  name: 'New User',
+  password: 'password'
+}
+
+const incompleteNewUserInfo = {
+  username: 'invalidnewuser',
+  password: 'invalidpassword'
+}
 
 const createAndLoginUser = async (
   name: string,
@@ -78,11 +97,19 @@ const createAndLoginUser = async (
   return token
 }
 
+const extractUsernames = (users: ReturnedUser[]) => {
+  return users.map((user) => user.username)
+}
+
 export {
   API,
   dummyTodos,
   createAndLoginUser,
   userWithTodo,
   userWithNoTodo,
-  nonExistentTodoId
+  nonExistentTodoId,
+  dummyUsers,
+  newUserInfo,
+  incompleteNewUserInfo,
+  extractUsernames
 }

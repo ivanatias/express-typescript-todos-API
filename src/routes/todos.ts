@@ -63,19 +63,19 @@ router.delete(
 router.post('/', userExtractor, async (req: ExtractorRequest, res, next) => {
   if (req.method !== 'POST') return res.status(405).end()
 
-  const todoFromRequest = req.body
+  const { title, isPriority } = req.body
 
   const { userId } = req
 
   const user = await User.findById(userId)
 
-  if (!todoFromRequest.title) {
+  if (!title) {
     return res.status(400).json({
       error: 'Todo title must be specified'
     })
   }
 
-  if (!isValidTodo(todoFromRequest)) {
+  if (!isValidTodo({ title, isPriority })) {
     return res.status(400).send({
       error:
         'Invalid Todo format. Todo title must be of type string and Todo priority must be of type boolean.'
@@ -85,8 +85,8 @@ router.post('/', userExtractor, async (req: ExtractorRequest, res, next) => {
   const newTodoToAdd = new Todo({
     isCompleted: false,
     date: Date.now(),
-    title: todoFromRequest.title,
-    isPriority: todoFromRequest.isPriority,
+    title,
+    isPriority,
     user: user?.id
   })
 

@@ -42,6 +42,21 @@ describe('POST users', () => {
   test('is not able to create a new user if one of the required fields is missing', async () => {
     await API.post('/api/users').send(incompleteNewUserInfo).expect(400)
   })
+
+  test('is not able to create a new user if the username is already taken', async () => {
+    const { username, name } = dummyUsers[0]
+    const newUser = {
+      username,
+      password: 'pswd',
+      name
+    }
+
+    const response = await API.post('/api/users').send(newUser).expect(409)
+    expect(response.body.error).toContain('This username already exists.')
+
+    const { body: users } = await API.get('/api/users')
+    expect(users).toHaveLength(dummyUsers.length)
+  })
 })
 
 afterAll(() => {

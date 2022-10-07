@@ -130,6 +130,21 @@ describe('POST todo', () => {
     const response = await API.get('/api/todos')
     expect(response.body).toHaveLength(dummyTodos.length + 1)
   })
+
+  test('a logged in user can not create a new todo if one of the fields is invalid', async () => {
+    const { name, username, passwordHash } = userWithNoTodo
+    const token = await createAndLoginUser(name, username, passwordHash)
+
+    const newTodo = {
+      title: 'This is a fresh, new todo',
+      isPriority: 'true'
+    }
+
+    await API.post('/api/todos')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newTodo)
+      .expect(400)
+  })
 })
 
 afterAll(() => {

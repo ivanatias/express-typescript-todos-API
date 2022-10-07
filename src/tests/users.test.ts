@@ -9,7 +9,7 @@ import {
   extractUsernames
 } from './helpers'
 
-beforeAll(async () => {
+beforeEach(async () => {
   await User.deleteMany({})
 
   for (const user of dummyUsers) {

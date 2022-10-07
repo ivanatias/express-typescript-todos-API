@@ -3,7 +3,7 @@ import { server } from '../index'
 import { User } from '../models/user'
 import { API, newUserInfo, incompleteNewUserInfo } from './helpers'
 
-beforeAll(async () => {
+beforeEach(async () => {
   await User.deleteMany({})
   await API.post('/api/users').send(newUserInfo)
 })

@@ -24,6 +24,21 @@ router.get('/', async (_req, res, next) => {
   }
 })
 
+router.get(
+  '/usertodos',
+  userExtractor,
+  async (req: ExtractorRequest, res, next) => {
+    const { userId } = req
+
+    try {
+      const user = await User.findById(userId).populate('todos')
+      res.json(user?.todos)
+    } catch (err) {
+      next(err)
+    }
+  }
+)
+
 router.get('/:id', async (req, res, next) => {
   const { id } = req.params
 

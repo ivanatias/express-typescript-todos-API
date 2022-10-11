@@ -32,6 +32,15 @@ describe('GET all todos', () => {
     const response = await API.get('/api/todos')
     expect(response.body).toHaveLength(dummyTodos.length)
   })
+
+  test('a logged in user can retrieve all his/her todos', async () => {
+    const { name, username, passwordHash, _id } = userWithTodo
+    const token = await createAndLoginUser(name, username, passwordHash, _id)
+
+    await API.get('/api/todos/usertodos')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+  })
 })
 
 describe('GET a todo', () => {

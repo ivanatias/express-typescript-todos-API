@@ -8,7 +8,7 @@ const router = express.Router()
 
 router.get('/', async (_req, res, next) => {
   try {
-    const users = await User.find({}).populate('todos')
+    const users = await User.find({})
 
     res.json(users)
   } catch (err) {

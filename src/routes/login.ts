@@ -36,7 +36,11 @@ router.post('/', async (req, res, next) => {
       expiresIn: '5d'
     })
 
-    res.json(tokenForUser)
+    res.send({
+      username: user.username,
+      name: user.name,
+      token: tokenForUser
+    })
   } catch (err) {
     next(err)
   }

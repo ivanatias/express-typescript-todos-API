@@ -6,16 +6,13 @@ import {
   dummyUsers,
   newUserInfo,
   incompleteNewUserInfo,
+  saveUsersInDB,
   extractUsernames
 } from './helpers'
 
 beforeEach(async () => {
   await User.deleteMany({})
-
-  for (const user of dummyUsers) {
-    const userObject = new User(user)
-    await userObject.save()
-  }
+  await saveUsersInDB()
 })
 
 describe('GET users', () => {

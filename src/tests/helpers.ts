@@ -80,6 +80,13 @@ const saveTodosInDB = async () => {
   }
 }
 
+const saveUsersInDB = async () => {
+  for (const user of dummyUsers) {
+    const userObject = new User(user)
+    await userObject.save()
+  }
+}
+
 const createAndLoginUser = async (
   name: string,
   username: string,
@@ -118,6 +125,7 @@ export {
   dummyTodos,
   dummyUsers,
   saveTodosInDB,
+  saveUsersInDB,
   createAndLoginUser,
   extractUsernames,
   nonExistentTodoId

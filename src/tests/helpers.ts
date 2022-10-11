@@ -3,6 +3,7 @@ import supertest from 'supertest'
 import { Types } from 'mongoose'
 import jwt from 'jsonwebtoken'
 import { User } from '../models/user'
+import { Todo } from '../models/todo'
 
 const { JWT_SECRET } = process.env
 
@@ -12,6 +13,17 @@ type ReturnedUser = {
   id: string
   name: string
   username: string
+}
+
+const newUserInfo = {
+  username: 'newuser',
+  name: 'New User',
+  password: 'password'
+}
+
+const incompleteNewUserInfo = {
+  username: 'invalidnewuser',
+  password: 'invalidpassword'
 }
 
 const userWithNoTodo = {
@@ -61,15 +73,11 @@ const dummyUsers = [userWithTodo, userWithNoTodo]
 
 const nonExistentTodoId = new Types.ObjectId()
 
-const newUserInfo = {
-  username: 'newuser',
-  name: 'New User',
-  password: 'password'
-}
-
-const incompleteNewUserInfo = {
-  username: 'invalidnewuser',
-  password: 'invalidpassword'
+const saveTodosInDB = async () => {
+  for (const todo of dummyTodos) {
+    const todoObject = new Todo(todo)
+    await todoObject.save()
+  }
 }
 
 const createAndLoginUser = async (
@@ -103,13 +111,14 @@ const extractUsernames = (users: ReturnedUser[]) => {
 
 export {
   API,
-  dummyTodos,
-  createAndLoginUser,
   userWithTodo,
   userWithNoTodo,
-  nonExistentTodoId,
-  dummyUsers,
   newUserInfo,
   incompleteNewUserInfo,
-  extractUsernames
+  dummyTodos,
+  dummyUsers,
+  saveTodosInDB,
+  createAndLoginUser,
+  extractUsernames,
+  nonExistentTodoId
 }

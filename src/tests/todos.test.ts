@@ -7,6 +7,7 @@ import {
   dummyTodos,
   userWithTodo,
   createAndLoginUser,
+  saveTodosInDB,
   userWithNoTodo,
   nonExistentTodoId
 } from './helpers'
@@ -14,11 +15,7 @@ import {
 beforeEach(async () => {
   await Todo.deleteMany({})
   await User.deleteMany({})
-
-  for (const todo of dummyTodos) {
-    const todoObject = new Todo(todo)
-    await todoObject.save()
-  }
+  await saveTodosInDB()
 })
 
 describe('GET all todos', () => {

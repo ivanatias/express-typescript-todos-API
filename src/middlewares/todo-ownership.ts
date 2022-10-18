@@ -18,9 +18,9 @@ export default async (
   const userIdInTodo = todoToDelete.user.toString()
 
   if (userIdInTodo !== userId) {
-    return res.status(401).send({
-      message: 'You are not authorized to manipulate this todo.'
-    })
+    return res
+      .status(401)
+      .send('You are not authorized to manipulate this todo.')
   }
 
   next()

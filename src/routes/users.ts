@@ -22,10 +22,11 @@ router.post('/', async (req, res, next) => {
   const { username, password, name } = req.body
 
   if (!username || !password || !name) {
-    return res.status(400).send({
-      error:
+    return res
+      .status(400)
+      .send(
         'Username, password and name are all required fields. Please provide all of them.'
-    })
+      )
   }
 
   try {

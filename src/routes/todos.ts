@@ -85,7 +85,7 @@ router.post('/', userExtractor, async (req: ExtractorRequest, res, next) => {
   const user = await User.findById(userId)
 
   if (!title) {
-    return res.status(400).json('Todo title must be specified')
+    return res.status(400).send('Todo title must be specified')
   }
 
   if (!isValidTodo({ title, isPriority })) {

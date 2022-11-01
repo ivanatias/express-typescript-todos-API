@@ -11,16 +11,20 @@ export default async (
 
   const { userId } = req
 
-  const todoToDelete = await Todo.findById(id)
+  try {
+    const todoToDelete = await Todo.findById(id)
 
-  if (!todoToDelete) return res.status(404).end()
+    if (!todoToDelete) return res.status(404).end()
 
-  const userIdInTodo = todoToDelete.user.toString()
+    const userIdInTodo = todoToDelete.user.toString()
 
-  if (userIdInTodo !== userId) {
-    return res
-      .status(401)
-      .send('You are not authorized to manipulate this todo.')
+    if (userIdInTodo !== userId) {
+      return res
+        .status(401)
+        .send('You are not authorized to manipulate this todo.')
+    }
+  } catch (err) {
+    next(err)
   }
 
   next()

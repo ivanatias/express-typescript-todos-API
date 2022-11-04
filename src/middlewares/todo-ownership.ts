@@ -23,9 +23,9 @@ export default async (
         .status(401)
         .send('You are not authorized to manipulate this todo.')
     }
+
+    next()
   } catch (err) {
     next(err)
   }
-
-  next()
 }

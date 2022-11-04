@@ -56,24 +56,19 @@ router.get('/:id', async (req, res, next) => {
   }
 })
 
-router.delete(
-  '/:id',
-  userExtractor,
-  todoOwnership,
-  async (req: ExtractorRequest, res, next) => {
-    if (req.method !== 'DELETE') return res.status(405).end()
+router.delete('/:id', userExtractor, todoOwnership, async (req, res, next) => {
+  if (req.method !== 'DELETE') return res.status(405).end()
 
-    const { id } = req.params
+  const { id } = req.params
 
-    try {
-      await Todo.findByIdAndDelete(id)
+  try {
+    await Todo.findByIdAndDelete(id)
 
-      res.status(204).end()
-    } catch (err) {
-      next(err)
-    }
+    res.status(204).end()
+  } catch (err) {
+    next(err)
   }
-)
+})
 
 router.post('/', userExtractor, async (req: ExtractorRequest, res, next) => {
   if (req.method !== 'POST') return res.status(405).end()
@@ -117,38 +112,33 @@ router.post('/', userExtractor, async (req: ExtractorRequest, res, next) => {
   }
 })
 
-router.put(
-  '/:id',
-  userExtractor,
-  todoOwnership,
-  async (req: ExtractorRequest, res, next) => {
-    if (req.method !== 'PUT') return res.status(405).end()
+router.put('/:id', userExtractor, todoOwnership, async (req, res, next) => {
+  if (req.method !== 'PUT') return res.status(405).end()
 
-    const { id } = req.params
+  const { id } = req.params
 
-    const { title, isPriority, isCompleted } = req.body
+  const { title, isPriority, isCompleted } = req.body
 
-    if (!title) {
-      return res.status(400).send('Todo title must be specified')
-    }
-
-    const newTodoContent = {
-      title,
-      isPriority,
-      isCompleted
-    }
-
-    try {
-      const updatedTodo = await Todo.findByIdAndUpdate(id, newTodoContent, {
-        new: true
-      })
-
-      res.json(updatedTodo)
-    } catch (err) {
-      next(err)
-    }
+  if (!title) {
+    return res.status(400).send('Todo title must be specified')
   }
-)
+
+  const newTodoContent = {
+    title,
+    isPriority,
+    isCompleted
+  }
+
+  try {
+    const updatedTodo = await Todo.findByIdAndUpdate(id, newTodoContent, {
+      new: true
+    })
+
+    res.json(updatedTodo)
+  } catch (err) {
+    next(err)
+  }
+})
 
 router.use(notFound)
 router.use(handleErrors)

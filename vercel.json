@@ -1,6 +1,0 @@
-{
-  "version": 2,
-  "name": "express-typescript-todos-api",
-  "builds": [{ "src": "/src/index.ts", "use": "@vercel/node" }],
-  "routes": [{ "src": "/src/(.*)", "dest": "/src/index.ts" }]
-}

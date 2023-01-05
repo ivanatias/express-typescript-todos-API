@@ -1,27 +1,27 @@
 import { NextFunction, Request, Response } from 'express'
 
-interface ErrorHandlers {
-  [key: string]: (res: Response, error?: Error) => void
+const MONGO_ERRORS = {
+  userAlreadyExists: 'E11000'
 }
 
-const ERROR_HANDLERS: ErrorHandlers = {
-  CastError: (res: Response) =>
-    res.status(400).send('The ID of the Todo is invalid.'),
+type ErrorHandler = (res: Response, error: Error) => void
 
-  MongoServerError: (res: Response, error?: Error) => {
-    if (error?.message.startsWith('E11000')) {
-      res.status(409).send('This username already exists.')
-    }
-    res.status(500).end()
+const ERROR_HANDLERS: Record<string, ErrorHandler> = {
+  CastError: (res) => res.status(400).send('The ID of the Todo is invalid.'),
+
+  MongoServerError: (res, error) => {
+    error.message.includes(MONGO_ERRORS.userAlreadyExists)
+      ? res.status(409).send('This username already exists.')
+      : res.status(500).end()
   },
 
-  JsonWebTokenError: (res: Response) =>
+  JsonWebTokenError: (res) =>
     res.status(401).send('The authorization token is missing or is invalid.'),
 
-  TokenExpiredError: (res: Response) =>
+  TokenExpiredError: (res) =>
     res.status(401).send('The authorization token has expired.'),
 
-  defaultError: (res: Response, error?: Error) => {
+  defaultError: (res, error) => {
     console.error(error)
     res.status(500).end()
   }

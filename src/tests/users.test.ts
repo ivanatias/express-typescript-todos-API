@@ -49,7 +49,7 @@ describe('POST users', () => {
     }
 
     const response = await API.post('/api/users').send(newUser).expect(409)
-    expect(response.body.error).toContain('This username already exists.')
+    expect(response.text).toBe('This username already exists.')
 
     const { body: users } = await API.get('/api/users')
     expect(users).toHaveLength(dummyUsers.length)

@@ -9,11 +9,18 @@
   "scripts": {
     "dev": "NODE_ENV=development ts-node-dev index.ts",
     "start": "NODE_ENV=production node build/index.js",
-    "build": "tsc",
+    "build": "rimraf build && tsc",
+    "add-build": "git add build",
+    "ts:check": "tsc",
     "test": "NODE_ENV=test PORT=1234 jest --verbose --runInBand",
     "test:watch": "npm run test -- --watch",
     "lint": "eslint --ext .js,.ts ."
   },
+  "pre-commit": [
+    "ts:check",
+    "build",
+    "add-build"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",

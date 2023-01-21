@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { server } from '../app'
+import { server } from '../index'
 import { Todo } from '../models/todo'
 import { User } from '../models/user'
 import {

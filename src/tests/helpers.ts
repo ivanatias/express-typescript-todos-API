@@ -1,4 +1,4 @@
-import { app } from '../index'
+import { app } from '../app'
 import supertest from 'supertest'
 import { Types } from 'mongoose'
 import jwt from 'jsonwebtoken'

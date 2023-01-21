@@ -2,6 +2,8 @@ import mongoose from 'mongoose'
 import { assertNonNullable } from './utils/simple-validators'
 import dotenv from 'dotenv'
 
+mongoose.set('strictQuery', true)
+
 dotenv.config()
 
 const { NODE_ENV, MONGODB_URI, MONGODB_URI_TEST } = process.env

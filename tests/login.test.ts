@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { server } from '../'
+import { server } from '..'
 import { User } from '../models/user'
 import { API, newUserInfo, incompleteNewUserInfo } from './helpers'
 

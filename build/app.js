@@ -18,7 +18,112 @@ app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 app.get('/', (_req, res) => {
     console.log('someone requested something at this endpoint!');
-    res.send('<h1>Todos API -> Node.js + Express.js + MongoDB + TypeScript</h1>');
+    res.json([
+        {
+            endpoint: '/api/todos',
+            options: [
+                {
+                    method: 'GET',
+                    parameters: [
+                        {
+                            name: 'all todos',
+                            endpoint: '/',
+                            description: 'Returns all todos from all users',
+                            authentication: false
+                        },
+                        {
+                            name: 'user todos',
+                            endpoint: '/usertodos',
+                            description: 'Returns all todos from a user',
+                            authentication: true
+                        },
+                        {
+                            name: 'todo',
+                            endpoint: '/:id',
+                            description: 'Returns a todo by its id',
+                            authentication: false
+                        }
+                    ]
+                },
+                {
+                    method: 'DELETE',
+                    parameters: [
+                        {
+                            name: 'delete todo',
+                            endpoint: '/:id',
+                            description: 'Finds a todo by its id and deletes it',
+                            authentication: true
+                        }
+                    ]
+                },
+                {
+                    method: 'POST',
+                    parameters: [
+                        {
+                            name: 'create todo',
+                            endpoint: '/',
+                            description: 'Creates and returns a new todo',
+                            authentication: true
+                        }
+                    ]
+                },
+                {
+                    method: 'PUT',
+                    parameters: [
+                        {
+                            name: 'modify todo',
+                            endpoint: '/:id',
+                            description: 'Finds a todo by its id and modifies it',
+                            authentication: true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            endpoint: '/api/users',
+            options: [
+                {
+                    method: 'GET',
+                    parameters: [
+                        {
+                            name: 'all users',
+                            endpoint: '/',
+                            description: 'Returns all users',
+                            authentication: false
+                        }
+                    ]
+                },
+                {
+                    method: 'POST',
+                    parameters: [
+                        {
+                            name: 'create user',
+                            endpoint: '/',
+                            description: 'Creates and returns a new user',
+                            authentication: false
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            endpoint: '/api/login',
+            options: [
+                {
+                    method: 'POST',
+                    parameters: [
+                        {
+                            name: 'login',
+                            endpoint: '/',
+                            description: 'Logs in a user by providing a session token',
+                            authentication: false
+                        }
+                    ]
+                }
+            ]
+        }
+    ]);
 });
 app.use('/api/todos', todos_1.default);
 app.use('/api/users', users_1.default);
